@@ -218,3 +218,16 @@ func (q *Query) Filter(fn func(Vertex) bool) *Query {
 	q.results = output
 	return q
 }
+
+//give only n number of results
+func (q *Query)Take(lim int) *Query {
+	var output []Vertex
+	var verLen = len(q.results)
+	if verLen <= lim{
+		output = q.results
+	}else{
+		output = q.results[:lim]
+	}
+	q.results = output
+	return q
+}
