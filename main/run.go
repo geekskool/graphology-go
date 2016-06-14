@@ -45,7 +45,7 @@ func main() {
 			fmt.Println(err)
 		}
 	}
-
+	//UNCOMMENT below block if you want to dump the graph data
 	//gdat, _ := json.MarshalIndent(graph, "", "    ")
 	//fmt.Println(string(gdat))
 

@@ -7,8 +7,10 @@ import (
 	"strconv"
 )
 
+//empty interface to accept anything
 type anything interface{}
 
+//struct to hold vertex data
 type Vertex struct {
 	Id    string              `json:"id"`
 	Label []string            `json:"label"`
@@ -17,6 +19,7 @@ type Vertex struct {
 	Props map[string]anything `json:"props,omitempty"`
 }
 
+//struct to hold edge data
 type Edge struct {
 	Id    string              `json:"id"`
 	Label string              `json:"label"`
@@ -25,6 +28,7 @@ type Edge struct {
 	Props map[string]anything `json:"props,omitempty"`
 }
 
+//struct to hold graph database
 type Graph struct {
 	Vertices     []*Vertex          `json:"vertices,omitempty"`
 	Edges        []*Edge            `json:"edges,omitempty"`
@@ -34,11 +38,13 @@ type Graph struct {
 	AutoEdgeId   int                `json:"-"`
 }
 
+//struct to hold query
 type Query struct {
 	graph   Graph
 	results []Vertex
 }
 
+//factory function for creating an empty graph
 func CreateGraph() Graph {
 	var graph Graph
 	graph.VertexIndex = make(map[string]*Vertex)
@@ -48,6 +54,8 @@ func CreateGraph() Graph {
 	return graph
 }
 
+//factory function for creating a query from a graph
+//searches the vertex with given name
 func (g *Graph) V(name string) *Query {
 	mv := g.FindVertices(name)
 	var query Query
@@ -56,6 +64,7 @@ func (g *Graph) V(name string) *Query {
 	return &query
 }
 
+//helper function to find the vertices with given name
 func (g *Graph) FindVertices(name string) []Vertex {
 	var vertices []Vertex
 	for _, v := range g.Vertices {
@@ -67,13 +76,14 @@ func (g *Graph) FindVertices(name string) []Vertex {
 	return vertices
 }
 
+//Add new vertex to graph
 func (g *Graph) AddVertex(v Vertex) (string, error) {
 	if v.Id == "" {
 		v.Id = strconv.Itoa(g.AutoVertexId)
 		g.AutoVertexId++
 	}
-	_, error := g.FindVertexById(v.Id)
-	if error == nil { //if the node with id exists, don't insert
+	_, err := g.FindVertexById(v.Id)
+	if err == nil { //if the node with id exists, don't insert
 		return "", errors.New("Node already exist")
 	}
 	g.Vertices = append(g.Vertices, &v)
@@ -81,6 +91,7 @@ func (g *Graph) AddVertex(v Vertex) (string, error) {
 	return v.Id, nil
 }
 
+//Search vertex with an ID
 func (g *Graph) FindVertexById(id string) (*Vertex, error) {
 	ver, ok := g.VertexIndex[id]
 	if ok {
@@ -89,6 +100,7 @@ func (g *Graph) FindVertexById(id string) (*Vertex, error) {
 	return ver, errors.New("A vertex with that ID does not exists")
 }
 
+//Search edge with an ID
 func (g *Graph) FindEdgeById(id string) (*Edge, error) {
 	edg, ok := g.EdgeIndex[id]
 	if ok {
@@ -97,6 +109,7 @@ func (g *Graph) FindEdgeById(id string) (*Edge, error) {
 	return edg, errors.New("A Edge with that ID does not exists")
 }
 
+//Add new edge to the graph
 func (g *Graph) AddEdge(edge Edge) (string, error) {
 	headVertex, error1 := g.FindVertexById(edge.Head)
 	tailVertex, error2 := g.FindVertexById(edge.Tail)
@@ -115,12 +128,15 @@ func (g *Graph) AddEdge(edge Edge) (string, error) {
 	return edge.Id, nil
 }
 
+//Final stage of a query
+//Prints the results in JSON format
 func (q *Query) Values() {
 	results := q.results
 	vdat, _ := json.MarshalIndent(results, "", "    ")
 	fmt.Println(string(vdat))
 }
 
+//Find all the outgoing vertices by relation type rel
 func (q *Query) Out(rel string) *Query {
 	input := q.results
 	var output []Vertex
@@ -140,6 +156,7 @@ func (q *Query) Out(rel string) *Query {
 	return q
 }
 
+//Find all the incoming vertices by relation type rel
 func (q *Query) In(rel string) *Query {
 	input := q.results
 	var output []Vertex
@@ -159,6 +176,7 @@ func (q *Query) In(rel string) *Query {
 	return q
 }
 
+//Find all vertices by relation type rel irrespective of direction
 func (q *Query) Both(rel string) *Query {
 	input := q.results
 	var output []Vertex
@@ -188,6 +206,7 @@ func (q *Query) Both(rel string) *Query {
 	return q
 }
 
+//Filter the results by giving a external filter function
 func (q *Query) Filter(fn func(Vertex) bool) *Query {
 	var output []Vertex
 	for _, v := range q.results {
