@@ -187,3 +187,15 @@ func (q *Query) Both(rel string) *Query {
 	q.results = output
 	return q
 }
+
+func (q *Query) Filter(fn func(Vertex) bool) *Query {
+	var output []Vertex
+	for _, v := range q.results {
+		fil := fn(v)
+		if fil {
+			output = append(output, v)
+		}
+	}
+	q.results = output
+	return q
+}

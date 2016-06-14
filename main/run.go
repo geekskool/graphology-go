@@ -46,8 +46,8 @@ func main() {
 		}
 	}
 
-	gdat, _ := json.MarshalIndent(graph, "", "    ")
-	fmt.Println(string(gdat))
+	//gdat, _ := json.MarshalIndent(graph, "", "    ")
+	//fmt.Println(string(gdat))
 
 	var query *graphology.Query
 	var node, name string
