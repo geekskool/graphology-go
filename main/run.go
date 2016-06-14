@@ -48,4 +48,24 @@ func main() {
 
 	gdat, _ := json.MarshalIndent(graph, "", "    ")
 	fmt.Println(string(gdat))
+
+	var query *graphology.Query
+	var node, name string
+
+	for {
+		fmt.Scanf("%s %s", &node, &name)
+		if node == "node" {
+			query = graph.V(name)
+		} else if node == "in" {
+			query = query.In(name)
+		} else if node == "out" {
+			query = query.Out(name)
+		} else if node == "both" {
+			query = query.Both(name)
+		} else if node == "exec" {
+			query.Values()
+		} else if node == "exit" {
+			return
+		}
+	}
 }
