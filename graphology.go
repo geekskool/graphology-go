@@ -1,7 +1,9 @@
 package graphology
 
 import (
+	"encoding/json"
 	"errors"
+	"fmt"
 	"strconv"
 )
 
@@ -111,4 +113,77 @@ func (g *Graph) AddEdge(edge Edge) (string, error) {
 	g.Edges = append(g.Edges, &edge)
 	g.EdgeIndex[edge.Id] = &edge
 	return edge.Id, nil
+}
+
+func (q *Query) Values() {
+	results := q.results
+	vdat, _ := json.MarshalIndent(results, "", "    ")
+	fmt.Println(string(vdat))
+}
+
+func (q *Query) Out(rel string) *Query {
+	input := q.results
+	var output []Vertex
+	for _, vert := range input {
+		outedgeIds := vert.Out
+		for _, oeid := range outedgeIds {
+			edg, err := q.graph.FindEdgeById(oeid)
+			if err == nil && edg.Label == rel {
+				ver, err := q.graph.FindVertexById(edg.Head)
+				if err == nil {
+					output = append(output, *ver)
+				}
+			}
+		}
+	}
+	q.results = output
+	return q
+}
+
+func (q *Query) In(rel string) *Query {
+	input := q.results
+	var output []Vertex
+	for _, vert := range input {
+		inedgeIds := vert.In
+		for _, ieid := range inedgeIds {
+			edg, err := q.graph.FindEdgeById(ieid)
+			if err == nil && edg.Label == rel {
+				ver, err := q.graph.FindVertexById(edg.Tail)
+				if err == nil {
+					output = append(output, *ver)
+				}
+			}
+		}
+	}
+	q.results = output
+	return q
+}
+
+func (q *Query) Both(rel string) *Query {
+	input := q.results
+	var output []Vertex
+	for _, vert := range input {
+		inedgeIds := vert.In
+		for _, ieid := range inedgeIds {
+			edg, err := q.graph.FindEdgeById(ieid)
+			if err == nil && edg.Label == rel {
+				ver, err := q.graph.FindVertexById(edg.Tail)
+				if err == nil {
+					output = append(output, *ver)
+				}
+			}
+		}
+		outedgeIds := vert.Out
+		for _, oeid := range outedgeIds {
+			edg, err := q.graph.FindEdgeById(oeid)
+			if err == nil && edg.Label == rel {
+				ver, err := q.graph.FindVertexById(edg.Head)
+				if err == nil {
+					output = append(output, *ver)
+				}
+			}
+		}
+	}
+	q.results = output
+	return q
 }
