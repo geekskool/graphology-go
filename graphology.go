@@ -1,5 +1,10 @@
 package graphology
 
+import (
+	"errors"
+	"strconv"
+)
+
 type anything interface{}
 
 type Vertex struct {
