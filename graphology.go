@@ -4,9 +4,10 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"strconv"
 	"io/ioutil"
 	"os"
+	"strconv"
+	"strings"
 )
 
 var dbPath string
@@ -43,6 +44,13 @@ type Graph struct {
 	AutoEdgeId   int                `json:"-"`
 }
 
+//struct to generate DB and store DB
+type DBstruct struct {
+	DBName    string
+	GVertices []*Vertex
+	GEdges    []*Edge
+}
+
 //struct to hold query
 type Query struct {
 	graph   Graph
@@ -64,11 +72,11 @@ func ListAllDBs() []string {
 	fileList, err := ioutil.ReadDir(GetPath())
 	var out []string
 	if err != nil {
-		fmt.Println("error listing db's : ",err)
+		fmt.Println("error listing db's : ", err)
 	}
-	for _, file := range fileList{
-		if !file.IsDir(){
-			out = append(out,file.Name())
+	for _, file := range fileList {
+		if !file.IsDir() {
+			out = append(out, file.Name())
 		}
 	}
 	return out
@@ -76,8 +84,8 @@ func ListAllDBs() []string {
 
 func Open(name string) (Graph, error) {
 	var graph Graph
-	if dbPath == ""{
-		return  graph, errors.New("Database path not set")
+	if dbPath == "" {
+		return graph, errors.New("Database path not set")
 	}
 	//TODO implementation
 	graph, _ = CreateGraph(name)
@@ -85,11 +93,16 @@ func Open(name string) (Graph, error) {
 }
 
 //factory function for creating an empty graph
-func CreateGraph(name string) (Graph, error)  {
+func CreateGraph(name string) (Graph, error) {
 	var graph Graph
-	if dbPath == ""{
-		return  graph, errors.New("Database path not set")
+	if dbPath == "" {
+		return graph, errors.New("Database path not set")
 	}
+	//name of db and graph both should have .db extension
+	if !strings.HasSuffix(name, ".db") {
+		name = fmt.Sprintf("%s.db", name)
+	}
+
 	graph.DBName = name
 	graph.VertexIndex = make(map[string]*Vertex)
 	graph.EdgeIndex = make(map[string]*Edge)
@@ -98,9 +111,29 @@ func CreateGraph(name string) (Graph, error)  {
 	return graph, nil
 }
 
-//save graph data to a file
+//save graphdata to a file
 func (g *Graph) Save() error {
 	//TODO implementation
+	var dbstr DBstruct
+	file, err := os.OpenFile(g.DBName, os.O_RDWR, 0600)
+	defer file.Close()
+
+	if err != nil {
+		fmt.Println("error saving database: ", err)
+		return err
+	}
+
+	dbstr.DBName = g.DBName
+	dbstr.GVertices = g.Vertices
+	dbstr.GEdges = g.Edges
+
+	enc := json.NewEncoder(file)
+	err = enc.Encode(dbstr)
+	if err != nil {
+		fmt.Println("error writing data to database: ", err)
+		return err
+	}
+
 	return nil
 }
 
