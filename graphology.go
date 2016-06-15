@@ -30,6 +30,7 @@ type Edge struct {
 
 //struct to hold graph database
 type Graph struct {
+	DBName       string             `json:"name"`
 	Vertices     []*Vertex          `json:"vertices,omitempty"`
 	Edges        []*Edge            `json:"edges,omitempty"`
 	VertexIndex  map[string]*Vertex `json:"-"`
@@ -45,8 +46,9 @@ type Query struct {
 }
 
 //factory function for creating an empty graph
-func CreateGraph() Graph {
+func CreateGraph(name string) Graph {
 	var graph Graph
+	graph.DBName = name
 	graph.VertexIndex = make(map[string]*Vertex)
 	graph.EdgeIndex = make(map[string]*Edge)
 	graph.AutoVertexId = 1
@@ -220,12 +222,12 @@ func (q *Query) Filter(fn func(Vertex) bool) *Query {
 }
 
 //give only n number of results
-func (q *Query)Take(lim int) *Query {
+func (q *Query) Take(lim int) *Query {
 	var output []Vertex
 	var verLen = len(q.results)
-	if verLen <= lim{
+	if verLen <= lim {
 		output = q.results
-	}else{
+	} else {
 		output = q.results[:lim]
 	}
 	q.results = output
