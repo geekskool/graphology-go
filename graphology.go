@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"strconv"
 	"io/ioutil"
+	"os"
 )
 
 var dbPath string
@@ -73,6 +74,16 @@ func ListAllDBs() []string {
 	return out
 }
 
+func Open(name string) (Graph, error) {
+	var graph Graph
+	if dbPath == ""{
+		return  graph, errors.New("Database path not set")
+	}
+	//TODO implementation
+	graph, _ = CreateGraph(name)
+	return graph, nil
+}
+
 //factory function for creating an empty graph
 func CreateGraph(name string) (Graph, error)  {
 	var graph Graph
@@ -85,6 +96,12 @@ func CreateGraph(name string) (Graph, error)  {
 	graph.AutoVertexId = 1
 	graph.AutoEdgeId = 1
 	return graph, nil
+}
+
+//save graph data to a file
+func (g *Graph) Save() error {
+	//TODO implementation
+	return nil
 }
 
 //factory function for creating a query from a graph
