@@ -30,11 +30,9 @@ func main() {
 		fmt.Println(err)
 		return
 	}
-	for _, v := range nodes {
-		_, err := graph.AddVertex(v)
-		if err != nil {
-			fmt.Println(err)
-		}
+	_, errs := graph.AddVertices(nodes)
+	if errs != nil {
+		fmt.Println("error inserting nodes: ", err)
 	}
 
 	edgedata, err := ioutil.ReadFile("./test-data/graphdb-edges.json") //read edges data in json format
@@ -48,11 +46,9 @@ func main() {
 		fmt.Println(err)
 		return
 	}
-	for _, v := range edges {
-		_, err := graph.AddEdge(v)
-		if err != nil {
-			fmt.Println(err)
-		}
+	_, errs = graph.AddEdges(edges)
+	if errs != nil {
+		fmt.Println("error inserting edges: ", errs)
 	}
 	//UNCOMMENT below block if you want to dump the graph data
 	gdat, _ := json.MarshalIndent(graph, "", "    ")
