@@ -5,7 +5,10 @@ import (
 	"errors"
 	"fmt"
 	"strconv"
+	"io/ioutil"
 )
+
+var dbPath string
 
 //empty interface to accept anything
 type anything interface{}
@@ -45,15 +48,43 @@ type Query struct {
 	results []Vertex
 }
 
+//set root directory for db files
+func SetPath(path string) {
+	dbPath = path
+}
+
+//get root directory for db files
+func GetPath() string {
+	return dbPath
+}
+
+//list all databases
+func ListAllDBs() []string {
+	fileList, err := ioutil.ReadDir(GetPath())
+	var out []string
+	if err != nil {
+		fmt.Println("error listing db's : ",err)
+	}
+	for _, file := range fileList{
+		if !file.IsDir(){
+			out = append(out,file.Name())
+		}
+	}
+	return out
+}
+
 //factory function for creating an empty graph
-func CreateGraph(name string) Graph {
+func CreateGraph(name string) (Graph, error)  {
 	var graph Graph
+	if dbPath == ""{
+		return  graph, errors.New("Database path not set")
+	}
 	graph.DBName = name
 	graph.VertexIndex = make(map[string]*Vertex)
 	graph.EdgeIndex = make(map[string]*Edge)
 	graph.AutoVertexId = 1
 	graph.AutoEdgeId = 1
-	return graph
+	return graph, nil
 }
 
 //factory function for creating a query from a graph
