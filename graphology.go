@@ -5,9 +5,12 @@ import (
 	"errors"
 	"fmt"
 	"io/ioutil"
+<<<<<<< HEAD
 	"os"
 	"strconv"
 	"strings"
+=======
+>>>>>>> master
 )
 
 var dbPath string
@@ -157,6 +160,36 @@ func (g *Graph) FindVertices(name string) []Vertex {
 		}
 	}
 	return vertices
+}
+
+//add list of vertices into graph
+func (g *Graph) AddVertices(vertices []Vertex) ([]string, []error) {
+	var errs []error
+	var out []string
+	for _, v := range vertices {
+		id, err := g.AddVertex(v)
+		if err != nil {
+			errs = append(errs, err)
+		} else {
+			out = append(out, id)
+		}
+	}
+	return out, errs
+}
+
+//add list of edges into graph
+func (g *Graph) AddEdges(edges []Edge) ([]string, []error) {
+	var errs []error
+	var out []string
+	for _, e := range edges {
+		id, err := g.AddEdge(e)
+		if err != nil {
+			errs = append(errs, err)
+		} else {
+			out = append(out, id)
+		}
+	}
+	return out, errs
 }
 
 //Add new vertex to graph
