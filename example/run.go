@@ -57,6 +57,7 @@ func main() {
 	//UNCOMMENT below block if you want to dump the graph data
 	gdat, _ := json.MarshalIndent(graph, "", "    ")
 	fmt.Println(string(gdat))
+	graph.Save()
 
 	var query *graphology.Query
 	var node, name string

@@ -5,12 +5,9 @@ import (
 	"errors"
 	"fmt"
 	"io/ioutil"
-<<<<<<< HEAD
 	"os"
 	"strconv"
 	"strings"
-=======
->>>>>>> master
 )
 
 var dbPath string
