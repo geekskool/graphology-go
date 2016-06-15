@@ -3,12 +3,21 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/geekskool/graphology-go"
 	"io/ioutil"
+	"os"
+
+	"github.com/geekskool/graphology-go"
 )
 
 func main() {
-	graph := graphology.CreateGraph()
+	graphology.SetPath("./test-data")
+	//fmt.Println(graphology.ListAllDBs())
+
+	graph, err := graphology.CreateGraph("greekmythology")
+	if err != nil {
+		fmt.Println("Error creating db : ", err)
+		os.Exit(0)
+	}
 
 	nodedata, err := ioutil.ReadFile("./test-data/graphdb-nodes.json") //read nodes data in json format
 	if err != nil {
@@ -46,8 +55,8 @@ func main() {
 		}
 	}
 	//UNCOMMENT below block if you want to dump the graph data
-	//gdat, _ := json.MarshalIndent(graph, "", "    ")
-	//fmt.Println(string(gdat))
+	gdat, _ := json.MarshalIndent(graph, "", "    ")
+	fmt.Println(string(gdat))
 
 	var query *graphology.Query
 	var node, name string

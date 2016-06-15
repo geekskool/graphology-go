@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"strconv"
 	"io/ioutil"
-	"os"
 )
 
 var dbPath string
@@ -64,11 +63,11 @@ func ListAllDBs() []string {
 	fileList, err := ioutil.ReadDir(GetPath())
 	var out []string
 	if err != nil {
-		fmt.Println("error listing db's : ",err)
+		fmt.Println("error listing db's : ", err)
 	}
-	for _, file := range fileList{
-		if !file.IsDir(){
-			out = append(out,file.Name())
+	for _, file := range fileList {
+		if !file.IsDir() {
+			out = append(out, file.Name())
 		}
 	}
 	return out
@@ -76,8 +75,8 @@ func ListAllDBs() []string {
 
 func Open(name string) (Graph, error) {
 	var graph Graph
-	if dbPath == ""{
-		return  graph, errors.New("Database path not set")
+	if dbPath == "" {
+		return graph, errors.New("Database path not set")
 	}
 	//TODO implementation
 	graph, _ = CreateGraph(name)
@@ -85,10 +84,10 @@ func Open(name string) (Graph, error) {
 }
 
 //factory function for creating an empty graph
-func CreateGraph(name string) (Graph, error)  {
+func CreateGraph(name string) (Graph, error) {
 	var graph Graph
-	if dbPath == ""{
-		return  graph, errors.New("Database path not set")
+	if dbPath == "" {
+		return graph, errors.New("Database path not set")
 	}
 	graph.DBName = name
 	graph.VertexIndex = make(map[string]*Vertex)
@@ -124,6 +123,36 @@ func (g *Graph) FindVertices(name string) []Vertex {
 		}
 	}
 	return vertices
+}
+
+//add list of vertices into graph
+func (g *Graph) AddVertices(vertices []Vertex) ([]string, []error) {
+	var errs []error
+	var out []string
+	for _, v := range vertices {
+		id, err := g.AddVertex(v)
+		if err != nil {
+			errs = append(errs, err)
+		} else {
+			out = append(out, id)
+		}
+	}
+	return out, errs
+}
+
+//add list of edges into graph
+func (g *Graph) AddEdges(edges []Edge) ([]string, []error) {
+	var errs []error
+	var out []string
+	for _, e := range edges {
+		id, err := g.AddEdge(e)
+		if err != nil {
+			errs = append(errs, err)
+		} else {
+			out = append(out, id)
+		}
+	}
+	return out, errs
 }
 
 //Add new vertex to graph
