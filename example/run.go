@@ -11,8 +11,6 @@ import (
 
 func main() {
 	graphology.SetPath("./test-data")
-	//fmt.Println(graphology.ListAllDBs())
-
 	graph, err := graphology.CreateGraph("greekmythology")
 	if err != nil {
 		fmt.Println("Error creating db : ", err)
@@ -51,9 +49,8 @@ func main() {
 		fmt.Println("error inserting edges: ", errs)
 	}
 	//UNCOMMENT below block if you want to dump the graph data
-	gdat, _ := json.MarshalIndent(graph, "", "    ")
-	fmt.Println(string(gdat))
-	graph.Save()
+	//gdat, _ := json.MarshalIndent(graph, "", "    ")
+	//fmt.Println(string(gdat))
 
 	var query *graphology.Query
 	var node, name string
@@ -72,6 +69,16 @@ func main() {
 			query.Values()
 		} else if node == "exit" {
 			return
+		} else if node == "load" {
+			graph, err = graphology.Open(name)
+			if err == nil {
+				fmt.Println("Successfully loaded db")
+			}
+		}else if node == "save" {
+			err = graph.Save()
+			if err == nil {
+				fmt.Println("Successfully saved file")
+			}
 		}
 	}
 }

@@ -107,15 +107,23 @@ func Open(name string) (Graph, error) {
 		return graph, err
 	}
 	dec := json.NewDecoder(file)
-	err = dec.Decode(dbstr)
+	err = dec.Decode(&dbstr)
 	if err != nil {
 		fmt.Println("corrupt database: ", err)
 		return graph, err
 	}
 	graph, _ = CreateGraph(name)
 	graph.DBName = dbstr.DBName
-	graph.AddVertices(dbstr.GVertices)
-	graph.AddEdges(dbstr.GEdges)
+	v := make([]Vertex, len(dbstr.GVertices))
+	for i, valv := range dbstr.GVertices {
+		v[i] = *valv
+	}
+	graph.AddVertices(v)
+	e := make([]Edge, len(dbstr.GEdges))
+	for i, vale := range dbstr.GEdges {
+		e[i] = *vale
+	}
+	graph.AddEdges(e)
 	return graph, nil
 }
 
