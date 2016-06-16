@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
+	"path/filepath"
 	"strconv"
 	"strings"
 )
@@ -82,13 +83,33 @@ func ListAllDBs() []string {
 	return out
 }
 
+//restore a database from a file
 func Open(name string) (Graph, error) {
 	var graph Graph
+	var dbstr DBstruct
 	if dbPath == "" {
 		return graph, errors.New("Database path not set")
 	}
-	//TODO implementation
+	if !strings.HasSuffix(name, ".db") {
+		name = fmt.Sprintf("%s.db", name)
+	}
+	fileLocn := filepath.Join(GetPath(), name)
+	file, err := os.OpenFile(fileLocn, os.O_RDONLY, 0600)
+	defer file.Close()
+	if err != nil {
+		fmt.Println("error opening database: ", err)
+		return graph, err
+	}
+	dec := json.NewDecoder(file)
+	err = dec.Decode(dbstr)
+	if err != nil {
+		fmt.Println("corrupt database: ", err)
+		return graph, err
+	}
 	graph, _ = CreateGraph(name)
+	graph.DBName = dbstr.DBName
+	graph.AddVertices(dbstr.GVertices)
+	graph.AddEdges(dbstr.GEdges)
 	return graph, nil
 }
 
