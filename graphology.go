@@ -4,8 +4,11 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"strconv"
 	"io/ioutil"
+	"os"
+	"path/filepath"
+	"strconv"
+	"strings"
 )
 
 var dbPath string
@@ -42,6 +45,13 @@ type Graph struct {
 	AutoEdgeId   int                `json:"-"`
 }
 
+//struct to generate DB and store DB
+type DBstruct struct {
+	DBName    string
+	GVertices []*Vertex
+	GEdges    []*Edge
+}
+
 //struct to hold query
 type Query struct {
 	graph   Graph
@@ -49,8 +59,14 @@ type Query struct {
 }
 
 //set root directory for db files
-func SetPath(path string) {
+func SetPath(path string) error {
+	err := os.MkdirAll(path, 0600)
+	if err != nil {
+		fmt.Println("failed to create directory :", err)
+		return err
+	}
 	dbPath = path
+	return nil
 }
 
 //get root directory for db files
@@ -73,13 +89,41 @@ func ListAllDBs() []string {
 	return out
 }
 
+//restore a database from a file
 func Open(name string) (Graph, error) {
 	var graph Graph
+	var dbstr DBstruct
 	if dbPath == "" {
 		return graph, errors.New("Database path not set")
 	}
-	//TODO implementation
+	if !strings.HasSuffix(name, ".db") {
+		name = fmt.Sprintf("%s.db", name)
+	}
+	fileLocn := filepath.Join(GetPath(), name)
+	file, err := os.OpenFile(fileLocn, os.O_RDONLY, 0600)
+	defer file.Close()
+	if err != nil {
+		fmt.Println("error opening database: ", err)
+		return graph, err
+	}
+	dec := json.NewDecoder(file)
+	err = dec.Decode(&dbstr)
+	if err != nil {
+		fmt.Println("corrupt database: ", err)
+		return graph, err
+	}
 	graph, _ = CreateGraph(name)
+	graph.DBName = dbstr.DBName
+	v := make([]Vertex, len(dbstr.GVertices))
+	for i, valv := range dbstr.GVertices {
+		v[i] = *valv
+	}
+	graph.AddVertices(v)
+	e := make([]Edge, len(dbstr.GEdges))
+	for i, vale := range dbstr.GEdges {
+		e[i] = *vale
+	}
+	graph.AddEdges(e)
 	return graph, nil
 }
 
@@ -89,6 +133,11 @@ func CreateGraph(name string) (Graph, error) {
 	if dbPath == "" {
 		return graph, errors.New("Database path not set")
 	}
+	//name of db and graph both should have .db extension
+	if !strings.HasSuffix(name, ".db") {
+		name = fmt.Sprintf("%s.db", name)
+	}
+
 	graph.DBName = name
 	graph.VertexIndex = make(map[string]*Vertex)
 	graph.EdgeIndex = make(map[string]*Edge)
@@ -97,9 +146,30 @@ func CreateGraph(name string) (Graph, error) {
 	return graph, nil
 }
 
-//save graph data to a file
+//save graphdata to a file
 func (g *Graph) Save() error {
-	//TODO implementation
+	var dbstr DBstruct
+	fileLocn := filepath.Join(GetPath(), g.DBName)
+	file, err := os.OpenFile(fileLocn, os.O_RDWR|os.O_CREATE, 0600)
+
+	if err != nil {
+		fmt.Println("error saving database: ", err)
+		return err
+	}
+
+	defer file.Close()
+
+	dbstr.DBName = g.DBName
+	dbstr.GVertices = g.Vertices
+	dbstr.GEdges = g.Edges
+
+	enc := json.NewEncoder(file)
+	err = enc.Encode(dbstr)
+	if err != nil {
+		fmt.Println("error writing data to database: ", err)
+		return err
+	}
+
 	return nil
 }
 
@@ -306,6 +376,31 @@ func (q *Query) Take(lim int) *Query {
 		output = q.results
 	} else {
 		output = q.results[:lim]
+	}
+	q.results = output
+	return q
+}
+
+// stores only unique elements in results
+func (q *Query) Unique() *Query {
+	var output []Vertex
+	var uniqElems = make(map[string]bool)
+	for _, v := range q.results {
+		if !uniqElems[v.Id] {
+			output = append(output, v)
+		}
+	}
+	q.results = output
+	return q
+}
+
+// stores all elements in the result except the given element
+func (q *Query) Except(name string) *Query {
+	var output []Vertex
+	for _, v := range q.results {
+		if v.Id != name {
+			output = append(output, v)
+		}
 	}
 	q.results = output
 	return q
