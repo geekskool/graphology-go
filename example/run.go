@@ -74,11 +74,14 @@ func main() {
 			if err == nil {
 				fmt.Println("Successfully loaded db")
 			}
-		}else if node == "save" {
+		} else if node == "save" {
 			err = graph.Save()
 			if err == nil {
 				fmt.Println("Successfully saved file")
 			}
+		} else if node == "print" {
+			gdat, _ := json.MarshalIndent(graph, "", "    ")
+			fmt.Println(string(gdat))
 		}
 	}
 }
