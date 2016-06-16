@@ -59,8 +59,14 @@ type Query struct {
 }
 
 //set root directory for db files
-func SetPath(path string) {
+func SetPath(path string) error {
+	err := os.MkdirAll(path, 0600)
+	if err != nil {
+		fmt.Println("failed to create directory :", err)
+		return err
+	}
 	dbPath = path
+	return nil
 }
 
 //get root directory for db files
@@ -134,15 +140,16 @@ func CreateGraph(name string) (Graph, error) {
 
 //save graphdata to a file
 func (g *Graph) Save() error {
-	//TODO implementation
 	var dbstr DBstruct
-	file, err := os.OpenFile(g.DBName, os.O_RDWR, 0600)
-	defer file.Close()
+	fileLocn := filepath.Join(GetPath(), g.DBName)
+	file, err := os.OpenFile(fileLocn, os.O_RDWR|os.O_CREATE, 0600)
 
 	if err != nil {
 		fmt.Println("error saving database: ", err)
 		return err
 	}
+
+	defer file.Close()
 
 	dbstr.DBName = g.DBName
 	dbstr.GVertices = g.Vertices
@@ -361,6 +368,31 @@ func (q *Query) Take(lim int) *Query {
 		output = q.results
 	} else {
 		output = q.results[:lim]
+	}
+	q.results = output
+	return q
+}
+
+// stores only unique elements in results
+func (q *Query) Unique() *Query {
+	var output []Vertex
+	var uniqElems = make(map[string]bool)
+	for _, v := range q.results {
+		if !uniqElems[v.Id] {
+			output = append(output, v)
+		}
+	}
+	q.results = output
+	return q
+}
+
+// stores all elements in the result except the given element
+func (q *Query) Except(name string) *Query {
+	var output []Vertex
+	for _, v := range q.results {
+		if v.Id != name {
+			output = append(output, v)
+		}
 	}
 	q.results = output
 	return q
