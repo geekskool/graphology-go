@@ -279,10 +279,8 @@ func (g *Graph) AddEdge(edge Edge) (string, error) {
 
 //Final stage of a query
 //Prints the results in JSON format
-func (q *Query) Values() {
-	results := q.results
-	vdat, _ := json.MarshalIndent(results, "", "    ")
-	fmt.Println(string(vdat))
+func (q *Query) Values() []Vertex {
+	return q.results
 }
 
 //Find all the outgoing vertices by relation type rel

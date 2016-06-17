@@ -66,7 +66,9 @@ func main() {
 		} else if node == "both" {
 			query = query.Both(name)
 		} else if node == "exec" {
-			query.Values()
+			results := query.Values()
+			vdat, _ := json.MarshalIndent(results, "", "    ")
+			fmt.Println(string(vdat))
 		} else if node == "exit" {
 			return
 		} else if node == "load" {
