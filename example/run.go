@@ -11,13 +11,13 @@ import (
 
 func main() {
 	graphology.SetPath("./test-data")
-	graph, err := graphology.CreateGraph("greekmythology")
+	graph, err := graphology.CreateGraph("gameofthrones")
 	if err != nil {
 		fmt.Println("Error creating db : ", err)
 		os.Exit(0)
 	}
 
-	nodedata, err := ioutil.ReadFile("./test-data/graphdb-nodes.json") //read nodes data in json format
+	nodedata, err := ioutil.ReadFile("./test-data/got-nodes.json") //read nodes data in json format
 	if err != nil {
 		fmt.Println(err)
 		return
@@ -33,7 +33,7 @@ func main() {
 		fmt.Println("error inserting nodes: ", err)
 	}
 
-	edgedata, err := ioutil.ReadFile("./test-data/graphdb-edges.json") //read edges data in json format
+	edgedata, err := ioutil.ReadFile("./test-data/got-edges.json") //read edges data in json format
 	if err != nil {
 		fmt.Println(err)
 		return
@@ -71,6 +71,11 @@ func main() {
 			fmt.Println(string(vdat))
 		} else if node == "exit" {
 			return
+		} else if node == "list" {
+			dblst := graphology.ListAllDBs()
+			for _, db := range dblst {
+				fmt.Println(db)
+			}
 		} else if node == "load" {
 			graph, err = graphology.Open(name)
 			if err == nil {

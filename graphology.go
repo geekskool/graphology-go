@@ -174,9 +174,8 @@ func CreateEdge() Edge {
 
 }
 
-// set values for the vertex
-func (e *Edge) SetEdgeValues(id string, head string, tail string, lab string, props map[string]anything) {
-	e.Id
+// set values for the edge
+func (e *Edge) SetEdgeValues( head string, tail string, lab string, props map[string]anything) {
 	e.Label = lab
 	e.Head = head
 	e.Tail = tail

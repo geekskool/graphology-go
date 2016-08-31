@@ -1,0 +1,22 @@
+<component name="libraryTable">
+  <library name="GOPATH &lt;graphology-go&gt;">
+    <CLASSES>
+      <root url="file://$PROJECT_DIR$/../../../honnef.co" />
+      <root url="file://$PROJECT_DIR$/../../../dsalgo" />
+      <root url="file://$PROJECT_DIR$/../.." />
+      <root url="file://$PROJECT_DIR$/../../../golang.org" />
+      <root url="file://$PROJECT_DIR$/../../../simplechat" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="file://$PROJECT_DIR$/../../../honnef.co" />
+      <root url="file://$PROJECT_DIR$/../../../dsalgo" />
+      <root url="file://$PROJECT_DIR$/../.." />
+      <root url="file://$PROJECT_DIR$/../../../golang.org" />
+      <root url="file://$PROJECT_DIR$/../../../simplechat" />
+    </SOURCES>
+    <excluded>
+      <root url="file://$PROJECT_DIR$" />
+    </excluded>
+  </library>
+</component>
