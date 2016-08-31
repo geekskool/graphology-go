@@ -51,6 +51,18 @@ List all the database available in the set path.
 ```go
 dblst := graphology.ListAllDBs()
 ```
+
+### Creating a new node and set values for the node
+```go
+vertex := CreateVertex()
+
+```
+Creates a variable of Vertex type , initializes its fields and returns Vertex. You have to set the values for the node
+```go
+vertex.SetVertexValues(id:"saturn", in :nil, out:nil, lab:[]string{"titan"}, props:map[string]anything{"age": 10000})
+```
+Set Values for the fields of the Vertex
+
 ### Add a node to the graph
 ```go
 id, err := graph.AddVertex(vertex)
@@ -60,6 +72,19 @@ Takes a `Vertex` variable as an argument and returns an `ID` of the inserted nod
 ids, errs := graph.AddVertices(vertices)
 ```
 Takes an vertices variable which is an array of `Vertex ([]Vertex)` as an argument and returns an array of ID's of the inserted nodes.
+
+### Creating a new edge and set values for the edge
+```go
+edge := CreateEdge()
+
+```
+Creates a variable of `Edge` type , initializes its fields and returns Edge. You have to set the values for the Edge
+```go
+edge.SetEdgeValues( head:v2.Vname, tail:v4.Vname, lab:"lives", props:map[string]anything{"reason": "loves fresh breezes"})
+
+```
+Set Values for the fields of the edge. edge `id` is automatically generated  
+
 
 ### Adding an edge/relationship to the graph
 ```go
