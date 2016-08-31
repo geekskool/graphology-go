@@ -13,10 +13,10 @@ import (
 
 var dbPath string
 
-//empty interface to accept anything
+// empty interface to accept anything
 type anything interface{}
 
-//struct to hold vertex data
+// struct to hold vertex data
 type Vertex struct {
 	Id    string              `json:"id"`
 	Label []string            `json:"label"`
@@ -25,7 +25,7 @@ type Vertex struct {
 	Props map[string]anything `json:"props,omitempty"`
 }
 
-//struct to hold edge data
+// struct to hold edge data
 type Edge struct {
 	Id    string              `json:"id"`
 	Label string              `json:"label"`
@@ -34,7 +34,7 @@ type Edge struct {
 	Props map[string]anything `json:"props,omitempty"`
 }
 
-//struct to hold graph database
+// struct to hold graph database
 type Graph struct {
 	DBName       string             `json:"name"`
 	Vertices     []*Vertex          `json:"vertices,omitempty"`
@@ -45,20 +45,20 @@ type Graph struct {
 	AutoEdgeId   int                `json:"-"`
 }
 
-//struct to generate DB and store DB
+// struct to generate DB and store DB
 type DBstruct struct {
 	DBName    string
 	GVertices []*Vertex
 	GEdges    []*Edge
 }
 
-//struct to hold query
+// struct to hold query
 type Query struct {
 	graph   Graph
 	results []Vertex
 }
 
-//set root directory for db files
+// set root directory for db files
 func SetPath(path string) error {
 	err := os.MkdirAll(path, 0600)
 	if err != nil {
@@ -144,6 +144,43 @@ func CreateGraph(name string) (Graph, error) {
 	graph.AutoVertexId = 1
 	graph.AutoEdgeId = 1
 	return graph, nil
+}
+
+//  returns a newly created Vertex
+func CreateVertex() Vertex {
+	var v Vertex
+	v.In = make([]string, 0)
+	v.Out = make([]string, 0)
+	v.Label = make([]string, 0)
+	v.Props = make(map[string]anything)
+	return v
+
+}
+
+// set values for the vertex
+func (v *Vertex) SetVertexValues(id string, in []string, out []string, lab []string, props map[string]anything) {
+	v.Id = id
+	v.Label = lab
+	v.In = in
+	v.Out = out
+	v.Props = props
+}
+
+// returns a newly created Edge
+func CreateEdge() Edge {
+	var e Edge
+	e.Props = make(map[string]anything)
+	return e
+
+}
+
+// set values for the vertex
+func (e *Edge) SetEdgeValues(id string, head string, tail string, lab string, props map[string]anything) {
+	e.Id
+	e.Label = lab
+	e.Head = head
+	e.Tail = tail
+	e.Props = props
 }
 
 //save graphdata to a file
